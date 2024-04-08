@@ -18,7 +18,7 @@ app.title = "Hedging Strategy Dashboard"
 
 cache = Cache(app.server, config={
     'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': '/home/orazs/'
+    'CACHE_DIR': '.'
 })
 
 
