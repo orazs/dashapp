@@ -184,7 +184,6 @@ def prepare_df(threshold):
         .groupby(["trade_monthname","trade_month"],as_index=False)["profitable","simulated_hedge_volume","gross_pnl_eur_sum","simulated_pnl","theo_b_revenue_eur_sum","theo_a_revenue_eur_sum","eur_volume_sum","hedge_volume","simulated_hedge_volume"]
         .agg(profitable_cnt=("profitable","count"),
               profitable_sum=("profitable","sum"),
-              profitable_sum=("profitable","sum"),
               gross_pnl_eur_sum=("gross_pnl_eur_sum","sum"),
               simulated_pnl = ("simulated_pnl","sum"),
               theo_a_revenue_eur_sum=("theo_a_revenue_eur_sum","sum"),
