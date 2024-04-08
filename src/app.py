@@ -180,9 +180,10 @@ def prepare_df(threshold):
 
     df = pd.melt((
         x_test
-        .assign(hedge_volume=lambda x: (1-x["warehoused_ratio"])*x['eur_volume_sum'])
+        .assign(hedge_volume=lambda x: (1-x["warehoused_ratio"])*x["eur_volume_sum"])
         .groupby(["trade_monthname","trade_month"],as_index=False)["profitable","simulated_hedge_volume","gross_pnl_eur_sum","simulated_pnl","theo_b_revenue_eur_sum","theo_a_revenue_eur_sum","eur_volume_sum","hedge_volume","simulated_hedge_volume"]
         .agg(profitable_cnt=("profitable","count"),
+              profitable_sum=("profitable","sum"),
               profitable_sum=("profitable","sum"),
               gross_pnl_eur_sum=("gross_pnl_eur_sum","sum"),
               simulated_pnl = ("simulated_pnl","sum"),
@@ -204,7 +205,7 @@ def prepare_df(threshold):
             cumulative_theoa=lambda x: x["theo_a_revenue_eur_sum"].cumsum(),
             cumulative_theob=lambda x: x["theo_b_revenue_eur_sum"].cumsum(),
             cumulative_real_pnl=lambda x: x["gross_pnl_eur_sum"].cumsum()
-        ),id_vars=["trade_monthname","trade_month"], value_vars=["simulated_hedge_ratio2",'cumulative_real_pnl',"theo_a_revenue_eur_sum","theo_b_revenue_eur_sum","cumulative_simulated_pnl","gross_pnl_eur_sum","simulated_pnl","real_hedge_ratio","simulated_hedge_ratio"])
+        ),id_vars=["trade_monthname","trade_month"], value_vars=["simulated_hedge_ratio2","cumulative_real_pnl","theo_a_revenue_eur_sum","theo_b_revenue_eur_sum","cumulative_simulated_pnl","gross_pnl_eur_sum","simulated_pnl","real_hedge_ratio","simulated_hedge_ratio"])
 
     return df
 
@@ -243,7 +244,7 @@ def graph_update(score_value=0.3):
     validation['value']=abs(validation['value'])
 
     # cumulative chart
-    line_fig = px.line(validation.loc[validation['variable'].isin(["cumulative_simulated_pnl","cumulative_theoa","cumulative_theob", "cumulative_real_pnl"])],
+    line_fig = px.line(validation.loc[validation["variable"].isin(["cumulative_simulated_pnl","cumulative_theoa","cumulative_theob", "cumulative_real_pnl"])],
                        x="trade_monthname",
                        y="value", color="variable",text='value',color_discrete_map={
         'cumulative_real_pnl': '#3182bd',
