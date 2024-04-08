@@ -68,6 +68,9 @@ skilling_template = go.layout.Template(
 pio.templates.default = skilling_template
 
 #load data
+
+x_test = pd.read_csv("data/x_test.csv")
+
 stats_df = pd.read_csv("data/thresholds.csv")
 
 
