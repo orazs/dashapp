@@ -68,10 +68,6 @@ skilling_template = go.layout.Template(
 pio.templates.default = skilling_template
 
 #load data
-df = px.data.stocks()
-df2 = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv')
-x_test = pd.read_csv("data/x_test.csv")
-# validation = pd.read_csv("data/validation_result.csv")
 stats_df = pd.read_csv("data/thresholds.csv")
 
 
@@ -174,15 +170,15 @@ def description_card():
 
 
 def prepare_df(threshold):
-    x_test['profitable'] =    x_test['score'].apply(lambda y: 1 if y>threshold else 0)
-    x_test['simulated_pnl'] = x_test.apply(lambda x: x['theo_a_revenue_eur_sum'] if x['profitable']==0 else x['theo_b_revenue_eur_sum'], axis=1)
-    x_test['simulated_hedge_volume'] = x_test.apply(lambda x: x['eur_volume_sum'] if x['profitable']==0 else 0, axis=1)
+    x_test["profitable"] =    x_test["score"].apply(lambda y: 1 if y>threshold else 0)
+    x_test["simulated_pnl"] = x_test.apply(lambda x: x["theo_a_revenue_eur_sum"] if x["profitable"]==0 else x["theo_b_revenue_eur_sum"], axis=1)
+    x_test["simulated_hedge_volume"] = x_test.apply(lambda x: x["eur_volume_sum"] if x["profitable"]==0 else 0, axis=1)
 
 
     df = pd.melt((
         x_test
-        .assign(hedge_volume=lambda x: (1-x['warehoused_ratio'])*x['eur_volume_sum'])
-        .groupby(['trade_monthname','trade_month'],as_index=False)['profitable','simulated_hedge_volume','gross_pnl_eur_sum','simulated_pnl',"theo_b_revenue_eur_sum","theo_a_revenue_eur_sum","eur_volume_sum","hedge_volume","simulated_hedge_volume"]
+        .assign(hedge_volume=lambda x: (1-x["warehoused_ratio"])*x['eur_volume_sum'])
+        .groupby(["trade_monthname","trade_month"],as_index=False)["profitable","simulated_hedge_volume","gross_pnl_eur_sum","simulated_pnl","theo_b_revenue_eur_sum","theo_a_revenue_eur_sum","eur_volume_sum","hedge_volume","simulated_hedge_volume"]
         .agg(profitable_cnt=("profitable","count"),
               profitable_sum=("profitable","sum"),
               gross_pnl_eur_sum=("gross_pnl_eur_sum","sum"),
@@ -193,19 +189,19 @@ def prepare_df(threshold):
               hedge_volume = ("hedge_volume","sum"),
               simulated_hedge_volume = ("simulated_hedge_volume","sum")
             )
-        .assign(real_hedge_ratio = lambda x: x['hedge_volume']/x['eur_volume_sum'],
-                simulated_hedge_ratio = lambda x: x['simulated_hedge_volume']/x['eur_volume_sum'],
-                simulated_hedge_ratio2 = lambda x: (x['profitable_cnt']-x['profitable_sum'])/x['profitable_cnt'],  #absolute values
+        .assign(real_hedge_ratio = lambda x: x["hedge_volume"]/x["eur_volume_sum"],
+                simulated_hedge_ratio = lambda x: x["simulated_hedge_volume"]/x["eur_volume_sum"],
+                simulated_hedge_ratio2 = lambda x: (x["profitable_cnt"]-x["profitable_sum"])/x["profitable_cnt"],  #absolute values
                )
-        .sort_values('trade_month')
+        .sort_values("trade_month")
 
     ).assign(
             # assign the cumulative sum of each name as a new column
-            cumulative_simulated_pnl=lambda x: x['simulated_pnl'].cumsum(),
-            cumulative_theoa=lambda x: x['theo_a_revenue_eur_sum'].cumsum(),
-            cumulative_theob=lambda x: x['theo_b_revenue_eur_sum'].cumsum(),
-            cumulative_real_pnl=lambda x: x['gross_pnl_eur_sum'].cumsum()
-        ),id_vars=['trade_monthname','trade_month'], value_vars=["simulated_hedge_ratio2",'cumulative_real_pnl',"theo_a_revenue_eur_sum","theo_b_revenue_eur_sum","cumulative_simulated_pnl","gross_pnl_eur_sum","simulated_pnl","real_hedge_ratio","simulated_hedge_ratio"])
+            cumulative_simulated_pnl=lambda x: x["simulated_pnl"].cumsum(),
+            cumulative_theoa=lambda x: x["theo_a_revenue_eur_sum"].cumsum(),
+            cumulative_theob=lambda x: x["theo_b_revenue_eur_sum"].cumsum(),
+            cumulative_real_pnl=lambda x: x["gross_pnl_eur_sum"].cumsum()
+        ),id_vars=["trade_monthname","trade_month"], value_vars=["simulated_hedge_ratio2",'cumulative_real_pnl',"theo_a_revenue_eur_sum","theo_b_revenue_eur_sum","cumulative_simulated_pnl","gross_pnl_eur_sum","simulated_pnl","real_hedge_ratio","simulated_hedge_ratio"])
 
     return df
 
@@ -218,7 +214,7 @@ def graph_update(score_value=0.3):
     # bar chart
     validation = query_data(score_value)
     validation['value']=abs(validation['value'])
-    bar_fig = px.bar(validation.loc[validation['variable'].isin(['gross_pnl_eur_sum', 'theo_a_revenue_eur_sum','theo_b_revenue_eur_sum','simulated_pnl'])],
+    bar_fig = px.bar(validation.loc[validation['variable'].isin(["gross_pnl_eur_sum", "theo_a_revenue_eur_sum","theo_b_revenue_eur_sum","simulated_pnl"])],
                      x="trade_monthname", y="value", color="variable", text_auto=True)
     bar_fig.update_traces(texttemplate="%{y:.2s}")
     bar_fig.update_layout(barmode='group',title_x=0)
@@ -244,7 +240,7 @@ def graph_update(score_value=0.3):
     validation['value']=abs(validation['value'])
 
     # cumulative chart
-    line_fig = px.line(validation.loc[validation['variable'].isin(['cumulative_simulated_pnl','cumulative_theoa','cumulative_theob', 'cumulative_real_pnl'])],
+    line_fig = px.line(validation.loc[validation['variable'].isin(["cumulative_simulated_pnl","cumulative_theoa","cumulative_theob", "cumulative_real_pnl"])],
                        x="trade_monthname",
                        y="value", color="variable",text='value',color_discrete_map={
         'cumulative_real_pnl': '#3182bd',
@@ -272,9 +268,9 @@ def graph_update(score_value=0.3):
 def graph_update(score_value=0.3):
     # bar chart
     validation = query_data(score_value)
-    validation['value']=abs(validation['value'])
-    ratios = validation.loc[validation['variable'] == "simulated_hedge_ratio2"]
-    bar_fig = px.bar(validation.loc[validation['variable'].isin(['real_hedge_ratio','simulated_hedge_ratio'])],
+    validation["value"]=abs(validation["value"])
+    ratios = validation.loc[validation["variable"] == "simulated_hedge_ratio2"]
+    bar_fig = px.bar(validation.loc[validation["variable"].isin(["real_hedge_ratio","simulated_hedge_ratio"])],
                      x="trade_monthname", y="value", color="variable", text_auto=True ,   color_discrete_map={
         'real_hedge_ratio': '#3182bd',
         'simulated_hedge_ratio': '#31a354'
@@ -298,14 +294,14 @@ def graph_update(score_value=0.3):
 #threshold chart
 score_fig = px.line(stats_df, x="thresholds", y="total_pnl",text="total_pnl")
 score_fig.update_traces(textposition="bottom right",texttemplate="%{y:.2s}")
-score_fig.add_hline(y=abs(x_test['gross_pnl_eur_sum'].sum()), line_width=2, line_dash="dash", line_color="#969696",annotation_text="Real", annotation_position="bottom right")
-score_fig.add_hline(y=abs(x_test['theo_b_revenue_eur_sum'].sum()), line_width=2, line_dash="dash", line_color="#3182bd",annotation_text="Theo B", annotation_position="bottom right")
+score_fig.add_hline(y=abs(x_test["gross_pnl_eur_sum"].sum()), line_width=2, line_dash="dash", line_color="#969696",annotation_text="Real", annotation_position="bottom right")
+score_fig.add_hline(y=abs(x_test["theo_b_revenue_eur_sum"].sum()), line_width=2, line_dash="dash", line_color="#3182bd",annotation_text="Theo B", annotation_position="bottom right")
 
 
 #threshold chart
 risk_fig = px.line(stats_df, x="thresholds", y="stds",text="stds")
 risk_fig.update_traces(textposition="bottom right",texttemplate="%{y:.2s}")
-risk_fig.add_hline(y=x_test['gross_pnl_eur_sum'].std(), line_width=2, line_dash="dash", line_color="#969696",annotation_text="Real", annotation_position="bottom right")
+risk_fig.add_hline(y=x_test["gross_pnl_eur_sum"].std(), line_width=2, line_dash="dash", line_color="#969696",annotation_text="Real", annotation_position="bottom right")
 
 
 
