@@ -51,17 +51,7 @@ skilling_template = go.layout.Template(
         'colorway': ['#bdd7e7','#6baed6','#3182bd','#31a354'],
         # Keep adding others as needed below
         'hovermode': 'x unified'
-    },
-    # DATA
-    # data = {
-    #     # Each graph object must be in a tuple or list for each trace
-    #     'bar': [go.Bar(texttemplate = '%{value:$.2s}',
-    #                    textposition='outside',
-    #                    textfont={'family': 'Helvetica Neue, Helvetica, Sans-serif',
-    #                              'size': 20,
-    #                              'color': '#FFFFFF'
-    #                              })]
-    # }
+    }
 )
 
 
@@ -85,10 +75,11 @@ modal = html.Div(
             [
                 dbc.ModalHeader(dbc.ModalTitle("Implementation details")),
                 dbc.ModalBody(["Training data: 01.2023- 08.2023 (Germany, Sweden, Norway only)",html.Br(),
+                               html.Img(src=app.get_asset_url("metrics.png")),html.Br(),
+                                html.Img(src=app.get_asset_url("fi.png")),html.Br(),
                                "Validation: (0.9.2023-12.2023)",html.Br(),
-                               "Method: XGB",html.Br(),
-                               "AUC: 68%",html.Br(),
-                               "F1: .61",html.Br()]),
+                               "Method: XGB",html.Br()]
+                              ),
                 dbc.ModalFooter(
                     dbc.Button(
                         "Close",
