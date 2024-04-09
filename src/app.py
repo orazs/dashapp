@@ -4,13 +4,13 @@ import plotly.graph_objects as go
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from dash import dcc, html, Input, Output, ClientsideFunction
+from dash import dcc, html, Input, Output, State
 import pandas as pd
 from flask_caching import Cache
 import os
 
 
-app = dash.Dash(external_stylesheets=[dbc.themes.GRID],
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP],
                 meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}])
 server = app. server
 app.title = "Hedging Strategy Dashboard"
@@ -74,6 +74,58 @@ x_test = pd.read_csv("data/x_test.csv")
 stats_df = pd.read_csv("data/thresholds.csv")
 
 
+
+#modal popup window
+modal = html.Div(
+    [
+        dbc.Button(
+            "More", id="open-body-scroll",n_clicks=0,className="btn btn-light"
+        ),
+        dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Implementation details")),
+                dbc.ModalBody(["Training data: 01.2023- 08.2023 (Germany, Sweden, Norway only)",html.Br(),
+                               "Validation: (0.9.2023-12.2023)",html.Br(),
+                               "Method: XGB",html.Br(),
+                               "AUC: 68%",html.Br(),
+                               "F1: .61",html.Br()]),
+                dbc.ModalFooter(
+                    dbc.Button(
+                        "Close",
+                        id="close-body-scroll",
+                        className="ms-auto",
+                        n_clicks=0,
+                    )
+                ),
+            ],
+            id="modal-body-scroll",
+            scrollable=True,
+            is_open=False,
+        ),
+    ]
+)
+
+
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+
+app.callback(
+    Output("modal-scroll", "is_open"),
+    [Input("open-scroll", "n_clicks"), Input("close-scroll", "n_clicks")],
+    [State("modal-scroll", "is_open")],
+)(toggle_modal)
+
+app.callback(
+    Output("modal-body-scroll", "is_open"),
+    [
+        Input("open-body-scroll", "n_clicks"),
+        Input("close-body-scroll", "n_clicks"),
+    ],
+    [State("modal-body-scroll", "is_open")],
+)(toggle_modal)
 
 def generate_control_card():
     """
@@ -162,7 +214,8 @@ def description_card():
             html.H3("Hedging strategy simulation",style={"color":"#3182bd"}),
             html.Div(
                 id="intro",
-                children=[html.P("Based on different score threshold explore potential performance* vs actual numbers using variety business measures")
+                children=[html.P("Based on different score threshold explore potential performance* vs actual numbers using variety business measures"),
+                          modal
 
 
                           ],
