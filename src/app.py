@@ -262,10 +262,7 @@ def prepare_df(threshold,df=x_test):
 
 def graph_update(data):
     # bar chart
-    if data is None:
-        validation = prepare_df(0.3,x_test)
-    else:
-        validation = pd.read_json(data, orient='split')
+    validation = pd.read_json(data, orient='split')
     validation['value']=abs(validation['value'])
     bar_fig = px.bar(validation.loc[validation['variable'].isin(['gross_pnl_eur_sum', 'theo_a_revenue_eur_sum','theo_b_revenue_eur_sum','simulated_pnl'])],
                      x="trade_monthname", y="value", color="variable", text_auto=True)
@@ -496,5 +493,5 @@ html.Div(id="initial")
 ], fluid=True,style={"margin":10,"padding":10})
 
 if __name__ == "__main__":
-    app.run_server(debug=True, port=7777, host='0.0.0.0')
+    app.run_server(debug=False, port=7777, host='0.0.0.0')
 
