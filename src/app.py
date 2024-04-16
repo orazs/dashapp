@@ -153,7 +153,7 @@ prevent_initial_call='initial_duplicate'
                )
 def initial_loading(n):
     # validation = prepare_df(0.3)
-    validation = pd.read_csv("/home/orazs/competitions/skilling/data/validation_results.csv")
+    validation = pd.read_csv("data/validation_results.csv")
     validation['value']=abs(validation['value'])
     return validation.to_json(date_format='iso', orient='split'), x_test.to_json(date_format='iso', orient='split'),get_thresholds(x_test).to_json(date_format='iso', orient='split')
 
