@@ -13,6 +13,7 @@ app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP],
                 meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}])
 app.title = "Hedging Strategy Dashboard"
 
+server = app. server
 
 xgb_model = joblib.load('hedging_model.pkl')
 
