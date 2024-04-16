@@ -7,3 +7,4 @@ dash_bootstrap_components
 dash_ag_grid
 joblib
 scikit-learn
+xgboost
